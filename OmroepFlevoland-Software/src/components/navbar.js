@@ -15,27 +15,26 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 const Navbar = () => {
     return (
         <div className='navbar'>
-            <a href='/home'>
+            <NavLink to="/">
                 <img className='logo' alt="logo" src={logo} />
-            </a>
+            </NavLink>
 
-            <div className='menu'>
+            <nav className='menu'>
                 <ul>
                     <li>
-                        <NavLink to="/stories">Stories</NavLink>
+                        <NavLink to="/stories" className={({ isActive }) => "nav-link" + (isActive ? " activeMenu" : "")}>Stories</NavLink>
                     </li>
                     <li>
-                        <NavLink to="/draaiboeken">Draaiboeken</NavLink>
+                        <NavLink to="/draaiboeken" className={({ isActive }) => "nav-link" + (isActive ? " activeMenu" : "")}>Draaiboeken</NavLink>
                     </li>
                     <li>
-                        <NavLink to="/media">Media</NavLink>
+                        <NavLink to="/media" className={({ isActive }) => "nav-link" + (isActive ? " activeMenu" : "")}>Media</NavLink>
                     </li>
                 </ul>
-            </div>
+            </nav>
 
             <div className='timer'>
-                <AccessTimeIcon />
-                <Clock format={'HH:mm:ss'} ticking={true} timezone={'Europe/Amsterdam'} />
+                <AccessTimeIcon />&nbsp;<Clock format={'HH:mm:ss'} ticking={true} timezone={'Europe/Amsterdam'} />
             </div>
 
             
@@ -45,9 +44,6 @@ const Navbar = () => {
                 </li>
                 <li>
                     <Link to="/#"><GridViewIcon /></Link>
-                </li>
-                <li>
-                    <Link to="/#"><CreateIcon /></Link>
                 </li>
                 <li>
                     <Link to="/#"><AccountCircleIcon /></Link>

@@ -2,12 +2,18 @@ import '../styles/task.css'
 import {useState} from 'react'
 import TaskItem from './TaskItem'
 import EditTask from './EditTask'
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import DragHandle from '@mui/icons-material/DragHandle';
+import DeleteForever from '@mui/icons-material/DeleteForever';
+import Button from '@mui/material/Button';
 import { doc, updateDoc, deleteDoc} from "firebase/firestore";
 import {db} from './firebase'
 
-function Task({id, title, locatie, contact, text, textLeft, completed}) {
-
-  const [checked, setChecked] = useState(completed)
+const Task = (props) => {
+  const [checked, setChecked] = useState(props.completed)
   const [open, setOpen] = useState({edit:false, view:false})
 
   const handleClose = () => {
@@ -16,7 +22,8 @@ function Task({id, title, locatie, contact, text, textLeft, completed}) {
 
   /* function to update firestore */
   const handleChange = async () => {
-    const taskDocRef = doc(db, 'tasks', id)
+    const taskDocRef = doc(db, 'tasks', props.id)
+    setChecked(this.event.target.checked);
     try{
       await updateDoc(taskDocRef, {
         completed: checked
@@ -28,75 +35,32 @@ function Task({id, title, locatie, contact, text, textLeft, completed}) {
 
   /* function to delete a document from firstore */ 
   const handleDelete = async () => {
-    const taskDocRef = doc(db, 'tasks', id)
+    const taskDocRef = doc(db, 'tasks', props.id)
     try{
       await deleteDoc(taskDocRef)
     } catch (err) {
       alert(err)
     }
   }
-  console.log({id, title, locatie, contact, text, textLeft, completed})
+
+  const truncate = (str) => {
+    if (str.length <= 60) { return str; }
+    const subString = str.substr(0, 60-1); // the original check
+    return (true ? subString.substr(0, subString.lastIndexOf(" ")) : subString) + "...";
+  }
+
+  const secondaryText = props.locatie + ": " + props.textLeft.replace(/<[^>]*>?/gm, '');;
+
   return (
-    
-    <div className={`task ${checked && 'task--borderColor'}`}>
-      <div>
-        <input 
-          id={`checkbox-${id}`} 
-          className='checkbox-custom'
-          name="checkbox" 
-          checked={checked}
-          onChange={handleChange}
-          type="checkbox" />
-        <label 
-          htmlFor={`checkbox-${id}`} 
-          className="checkbox-custom-label" 
-          onClick={() => setChecked(!checked)} ></label>
-      </div>
-      <div className='task__body'>
-        <h2>{title}</h2>
-        <p>{locatie}</p>
-        <p>{contact}</p>
-        <p>{text}</p>
-        <p>{textLeft}</p>
-        <div className='task__buttons'>
-          <div className='task__deleteNedit'>
-            <button 
-              className='task__editButton' 
-              onClick={() => setOpen({...open, edit : true})}>
-              Aanpassen
-            </button>
-            <button className='task__deleteButton' onClick={handleDelete}>Verwijderen</button>
-          </div>
-          <button 
-            onClick={() => setOpen({...open, view: true})}>
-            Open
-          </button>
-        </div>
-      </div>
-
-      {open.view &&
-        <TaskItem 
-        onClick={handleClose} 
-          title={title} 
-          locatie={locatie}
-          contact={contact}
-          text={text} 
-          textLeft={textLeft}
-          open={open.view} />
-      }
-
-      {open.edit &&
-        <EditTask 
-        onClick={handleClose} 
-          toEditTitle={title} 
-          toEditLocatie={locatie} 
-          toEditContact={contact} 
-          toEditText={text} 
-          open={open.edit}
-          id={id} />
-      }
-
-    </div>
+    <ListItem disablePadding onClick={props.onClick}>
+      <ListItemButton>
+        <ListItemIcon>
+          <DragHandle sx={{color:'#bf2133'}}/>
+        </ListItemIcon>
+        <ListItemText primary={truncate(props.title)} secondary={truncate(secondaryText)} sx={{minWidth:'50%',}}/>
+        <Button className='task__deleteButton' onClick={handleDelete} sx={{position:'absolute', bottom:'5px', right:'15px', color:'#bf2133'}}><DeleteForever/></Button>
+      </ListItemButton>
+    </ListItem>
   )
 }
 
